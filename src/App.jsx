@@ -486,6 +486,13 @@ function App() {
 
             <div className="field">
               <label htmlFor="payment">Proof of Venmo payment ($100 minimum)</label>
+              <p className="field-hint">
+                Send $100+ to{' '}
+                <a href="https://venmo.com/u/Tommaso-Castelli" target="_blank" rel="noopener noreferrer">
+                  @Tommaso-Castelli
+                </a>{' '}
+                on Venmo, then upload a screenshot of the payment below.
+              </p>
               <div className="upload">
                 {paymentPreview ? (
                   <img src={paymentPreview} alt="Payment proof preview" className="upload-preview" />
