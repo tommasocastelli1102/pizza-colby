@@ -1,16 +1,68 @@
-# React + Vite
+# Colby Ave Pizza Contest
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A React + Vite site for the apartment pizza contest at 1515 Colby Ave, PH4, with a
+VIP waiting-list sign-up form (photo, Venmo payment proof, and the all-important
+pineapple question).
 
-Currently, two official plugins are available:
+## Project structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- `src/` — the React frontend (Vite).
+- `server/` — a small Express + Nodemailer backend that emails every form
+  submission (with the photo and payment-proof attachments) to
+  `kevin.mannix20@gmail.com` and `tommasocastelli1102@gmail.com`.
 
-## React Compiler
+## Running locally
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+You need both the frontend and the backend running.
 
-## Expanding the Oxlint configuration
+### 1. Backend (email sender)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+```bash
+cd server
+npm install
+cp .env.example .env
+```
+
+Edit `server/.env` and fill in a real sender account:
+
+```
+SMTP_USER=your-gmail-address@gmail.com
+SMTP_PASS=your-16-character-app-password
+```
+
+`SMTP_PASS` must be a Gmail **App Password**, not your normal password (Gmail
+blocks plain-password SMTP logins). Create one at
+[myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
+(requires 2-Step Verification to be enabled on the account).
+
+Then start it:
+
+```bash
+npm run dev
+```
+
+It listens on `http://localhost:5001`.
+
+### 2. Frontend
+
+```bash
+npm install
+npm run dev
+```
+
+Opens on `http://localhost:3000`. In dev, requests to `/api/apply` are proxied
+to the backend on port 5001 (see `vite.config.js`), so no extra CORS setup is
+needed locally.
+
+## Deploying
+
+This is two separate deployables:
+
+- The frontend is a static Vite build (`npm run build` → `dist/`) — deploy it
+  anywhere that serves static files (Netlify, Vercel, GitHub Pages, etc.).
+- The backend needs an actual Node process running (it's not static) — deploy
+  it somewhere that can run a long-lived Node server (Render, Railway, Fly.io,
+  a small VPS, etc.) and set `SMTP_USER`/`SMTP_PASS` as environment variables
+  there. Then point the frontend at that backend's URL instead of the `/api`
+  proxy (e.g. via a `VITE_API_URL` env var) if they're not served from the
+  same origin.

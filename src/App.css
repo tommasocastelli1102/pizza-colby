@@ -360,6 +360,11 @@ button.primary:hover {
   background: var(--terracotta-deep);
 }
 
+button.primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 button.secondary {
   font: inherit;
   font-weight: 600;

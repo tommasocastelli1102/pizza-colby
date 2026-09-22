@@ -50,6 +50,8 @@ function App() {
   const [paymentPreview, setPaymentPreview] = useState(null)
   const [errors, setErrors] = useState({})
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   function handlePhotoChange(e) {
     const file = e.target.files?.[0] ?? null
@@ -77,12 +79,28 @@ function App() {
     return next
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     const validationErrors = validate(form)
     setErrors(validationErrors)
-    if (Object.keys(validationErrors).length === 0) {
+    if (Object.keys(validationErrors).length > 0) return
+
+    setSubmitting(true)
+    setSubmitError('')
+    try {
+      const body = new FormData()
+      body.append('photo', form.photo)
+      body.append('payment', form.payment)
+      body.append('pineapple', form.pineapple)
+
+      const res = await fetch('/api/apply', { method: 'POST', body })
+      if (!res.ok) throw new Error('Request failed')
+
       setSubmitted(true)
+    } catch {
+      setSubmitError("Something went wrong sending your application. Please try again.")
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -93,6 +111,7 @@ function App() {
     setPhotoPreview(null)
     setPaymentPreview(null)
     setErrors({})
+    setSubmitError('')
     setSubmitted(false)
   }
 
@@ -278,8 +297,10 @@ function App() {
               {errors.pineapple && <span className="error">{errors.pineapple}</span>}
             </fieldset>
 
-            <button type="submit" className="primary">
-              Join the waiting list
+            {submitError && <span className="error">{submitError}</span>}
+
+            <button type="submit" className="primary" disabled={submitting}>
+              {submitting ? 'Sending…' : 'Join the waiting list'}
             </button>
           </form>
         )}
