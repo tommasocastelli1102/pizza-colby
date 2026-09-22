@@ -1,0 +1,92 @@
+:root {
+  --cream: #f6f1e6;
+  --cream-deep: #eee4cf;
+  --card: #fffcf5;
+  --ink: #2c2620;
+  --ink-soft: #6f6555;
+  --line: #e3d7bd;
+  --olive: #5f6b45;
+  --olive-deep: #3f4a2c;
+  --olive-bg: rgba(95, 107, 69, 0.08);
+  --terracotta: #b6532f;
+  --terracotta-deep: #8f3f23;
+  --terracotta-bg: rgba(182, 83, 47, 0.08);
+  --gold: #b28a3f;
+  --shadow:
+    rgba(44, 38, 32, 0.08) 0 14px 32px -12px, rgba(44, 38, 32, 0.05) 0 4px 10px -4px;
+
+  --sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font: 17px/1.65 var(--sans);
+  color-scheme: light;
+  color: var(--ink-soft);
+  background: var(--cream);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--cream);
+}
+
+#root {
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow-x: clip;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--display);
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0;
+}
+
+h1 {
+  font-size: 60px;
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+  @media (max-width: 1024px) {
+    font-size: 38px;
+  }
+}
+h2 {
+  font-size: 34px;
+  line-height: 1.15;
+  @media (max-width: 1024px) {
+    font-size: 26px;
+  }
+}
+h3 {
+  font-size: 20px;
+}
+p {
+  margin: 0;
+}
+
+code {
+  font-family: var(--mono);
+  display: inline-flex;
+  border-radius: 4px;
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 135%;
+  padding: 4px 8px;
+  background: var(--cream-deep);
+}
