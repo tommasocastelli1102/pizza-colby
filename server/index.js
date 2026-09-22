@@ -25,6 +25,10 @@ const transporter = nodemailer.createTransport({
 const app = express()
 app.use(cors())
 
+app.get('/', (req, res) => {
+  res.json({ ok: true })
+})
+
 app.post(
   '/api/apply',
   upload.fields([

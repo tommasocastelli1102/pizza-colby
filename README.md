@@ -54,15 +54,24 @@ Opens on `http://localhost:3000`. In dev, requests to `/api/apply` are proxied
 to the backend on port 5001 (see `vite.config.js`), so no extra CORS setup is
 needed locally.
 
-## Deploying
+## Deploying (Render)
 
-This is two separate deployables:
+This repo includes a `render.yaml` Blueprint that deploys both pieces at once:
 
-- The frontend is a static Vite build (`npm run build` → `dist/`) — deploy it
-  anywhere that serves static files (Netlify, Vercel, GitHub Pages, etc.).
-- The backend needs an actual Node process running (it's not static) — deploy
-  it somewhere that can run a long-lived Node server (Render, Railway, Fly.io,
-  a small VPS, etc.) and set `SMTP_USER`/`SMTP_PASS` as environment variables
-  there. Then point the frontend at that backend's URL instead of the `/api`
-  proxy (e.g. via a `VITE_API_URL` env var) if they're not served from the
-  same origin.
+- `pizza-colby-api` — the Node backend (`server/`).
+- `pizza-colby-web` — the static frontend build, automatically pointed at the
+  API's URL via a `VITE_API_URL` build-time env var.
+
+To deploy:
+
+1. On [Render](https://dashboard.render.com/blueprint/new), pick **New →
+   Blueprint** and select this GitHub repo.
+2. Render finds `render.yaml` and shows both services — click through to
+   create them.
+3. Once created, open the `pizza-colby-api` service → **Environment** and
+   fill in the two secrets it needs (left blank in the blueprint on purpose):
+   - `SMTP_USER` — your Gmail address
+   - `SMTP_PASS` — a Gmail [App Password](https://myaccount.google.com/apppasswords)
+4. Redeploy `pizza-colby-api` after adding those (Render prompts for this).
+
+Both services auto-deploy on every push to `main` from then on.

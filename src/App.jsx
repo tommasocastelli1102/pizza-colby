@@ -16,6 +16,8 @@ import chefTommy from './assets/chefs/chef-marco.webp'
 import chefKevin from './assets/chefs/chef-luca.webp'
 import sherlockHarry from './assets/sherlock-harry.webp'
 
+const API_BASE = import.meta.env.VITE_API_URL ?? ''
+
 const chefs = [
   {
     id: 1,
@@ -174,7 +176,7 @@ function App() {
       body.append('payment', form.payment)
       body.append('pineapple', form.pineapple)
 
-      const res = await fetch('/api/apply', { method: 'POST', body })
+      const res = await fetch(`${API_BASE}/api/apply`, { method: 'POST', body })
       if (!res.ok) throw new Error('Request failed')
 
       setSubmitted(true)
@@ -238,7 +240,7 @@ function App() {
         <h1>
           The Great Apartment
           <br />
-          <em>Pizza Contest</em>
+          <em>OBJECTIVE Pizza Contest</em>
         </h1>
         <a className="cta" href="#join">
           Join the VIP waiting list
