@@ -30,14 +30,14 @@ const chefs = [
   },
   {
     id: 2,
-    name: 'Kevin',
+    name: 'Kevin for you',
     apartment: 'PH4',
     img: chefKevin,
     quote: 'Widely regarded as a loser. Still showing up to compete anyway.',
     specialty: 'Gourmet white pizzas with seasonal toppings',
     rating: 3,
     reviews: 21,
-    tags: ['White pizza', 'Seasonal', 'Certified loser'],
+    tags: ['Graduated', 'Canadian business school', 'Maximum grade'],
   },
 ]
 
