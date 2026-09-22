@@ -12,6 +12,7 @@ import {
 } from './components/Decor'
 import chefTommy from './assets/chefs/chef-marco.webp'
 import chefKevin from './assets/chefs/chef-luca.webp'
+import sherlockHarry from './assets/sherlock-harry.webp'
 
 const chefs = [
   {
@@ -52,6 +53,11 @@ function App() {
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
+
+  const [evalPhoto, setEvalPhoto] = useState(null)
+  const [evalPreview, setEvalPreview] = useState(null)
+  const [evaluating, setEvaluating] = useState(false)
+  const [evalDone, setEvalDone] = useState(false)
 
   function handlePhotoChange(e) {
     const file = e.target.files?.[0] ?? null
@@ -102,6 +108,31 @@ function App() {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  function handleEvalPhotoChange(e) {
+    const file = e.target.files?.[0] ?? null
+    if (evalPreview) URL.revokeObjectURL(evalPreview)
+    setEvalPhoto(file)
+    setEvalPreview(file ? URL.createObjectURL(file) : null)
+    setEvalDone(false)
+  }
+
+  function handleEvaluate() {
+    if (!evalPhoto) return
+    setEvaluating(true)
+    setTimeout(() => {
+      setEvaluating(false)
+      setEvalDone(true)
+    }, 1400)
+  }
+
+  function handleEvalReset() {
+    if (evalPreview) URL.revokeObjectURL(evalPreview)
+    setEvalPhoto(null)
+    setEvalPreview(null)
+    setEvaluating(false)
+    setEvalDone(false)
   }
 
   function handleReset() {
@@ -190,6 +221,62 @@ function App() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="detective">
+        <div className="detective-card">
+          <img src={sherlockHarry} alt="Sherlock Harry" className="detective-photo" />
+          <div className="detective-body">
+            <h2>Think you have what it takes?</h2>
+            <p className="section-subtitle detective-subtitle">
+              Do you want to participate as a chef? Upload your picture here and our
+              own Sherlock Harry will evaluate it and see if it&apos;s good enough.
+            </p>
+
+            {evalDone ? (
+              <div className="verdict">
+                <p className="verdict-text">&ldquo;It&apos;s not good enough, Watson.&rdquo;</p>
+                <button type="button" className="secondary" onClick={handleEvalReset}>
+                  Try again
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="upload">
+                  {evalPreview ? (
+                    <img src={evalPreview} alt="Your preview" className="upload-preview" />
+                  ) : (
+                    <div className="upload-placeholder" aria-hidden="true">
+                      <CameraIcon size={22} />
+                    </div>
+                  )}
+                  <div className="upload-body">
+                    <label htmlFor="evalPhoto" className="upload-button">
+                      {evalPhoto ? 'Change photo' : 'Choose photo'}
+                    </label>
+                    <span className="upload-filename">{evalPhoto?.name ?? 'No file selected'}</span>
+                  </div>
+                  <input
+                    id="evalPhoto"
+                    name="evalPhoto"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleEvalPhotoChange}
+                    className="upload-input"
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="primary"
+                  onClick={handleEvaluate}
+                  disabled={!evalPhoto || evaluating}
+                >
+                  {evaluating ? 'Sherlock Harry is deducing…' : 'Submit for evaluation'}
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </section>
 

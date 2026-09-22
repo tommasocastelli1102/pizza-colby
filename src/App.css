@@ -220,6 +220,71 @@ h1 em {
   color: var(--olive-deep);
 }
 
+/* Detective banner */
+.detective {
+  padding: 72px 24px;
+  background: var(--ink);
+}
+
+.detective h2 {
+  color: var(--cream);
+}
+
+.detective-subtitle {
+  color: rgba(246, 241, 230, 0.72);
+}
+
+.detective-card {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  text-align: left;
+}
+
+.detective-photo {
+  width: 168px;
+  height: 168px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--gold);
+  flex-shrink: 0;
+}
+
+.detective-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.detective-body .upload {
+  margin-top: 20px;
+}
+
+.detective-body button.primary {
+  margin-top: 18px;
+}
+
+.verdict-text {
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 22px;
+  color: var(--cream);
+  margin: 8px 0 18px;
+}
+
+.verdict .secondary {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+@media (max-width: 640px) {
+  .detective-card {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
 /* Join form */
 .join-form {
   max-width: 460px;
