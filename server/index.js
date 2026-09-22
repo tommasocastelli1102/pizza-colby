@@ -12,10 +12,12 @@ const upload = multer({
   limits: { fileSize: 8 * 1024 * 1024 },
 })
 
+const smtpPort = Number(process.env.SMTP_PORT) || 587
+
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: Number(process.env.SMTP_PORT) || 465,
-  secure: true,
+  port: smtpPort,
+  secure: smtpPort === 465,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
