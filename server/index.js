@@ -2,33 +2,16 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import multer from 'multer'
-import nodemailer from 'nodemailer'
 import pg from 'pg'
 
 const { Pool } = pg
 
 const PORT = process.env.PORT || 5001
-const RECIPIENTS = ['kevin.mannix20@gmail.com', 'tommasocastelli1102@gmail.com']
 const ADMIN_KEY = process.env.ADMIN_KEY
 
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 8 * 1024 * 1024 },
-})
-
-const smtpPort = Number(process.env.SMTP_PORT) || 587
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: smtpPort,
-  secure: smtpPort === 465,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-  connectionTimeout: 10_000,
-  greetingTimeout: 10_000,
-  socketTimeout: 15_000,
 })
 
 // Local dev without DATABASE_URL just skips persistence rather than failing.
@@ -49,9 +32,12 @@ async function ensureSchema() {
       photo BYTEA NOT NULL,
       photo_type TEXT NOT NULL,
       payment BYTEA NOT NULL,
-      payment_type TEXT NOT NULL
+      payment_type TEXT NOT NULL,
+      notified_at TIMESTAMPTZ
     )
   `)
+  // ADD COLUMN IF NOT EXISTS covers tables created before notified_at existed.
+  await pool.query(`ALTER TABLE submissions ADD COLUMN IF NOT EXISTS notified_at TIMESTAMPTZ`)
 }
 
 await ensureSchema().catch((err) => {
@@ -69,7 +55,7 @@ const app = express()
 app.use(cors())
 
 app.get('/', (req, res) => {
-  res.json({ ok: true, database: Boolean(pool), email: Boolean(process.env.SMTP_USER) })
+  res.json({ ok: true, database: Boolean(pool) })
 })
 
 app.post(
@@ -98,30 +84,6 @@ app.post(
         console.error('Failed to save submission to database:', err)
         return res.status(500).json({ error: 'Failed to save submission.' })
       }
-    }
-
-    // Best-effort: a submission is already saved above, so an email hiccup
-    // (e.g. SMTP being blocked by the host) shouldn't fail the request.
-    try {
-      await transporter.sendMail({
-        from: process.env.SMTP_USER,
-        to: RECIPIENTS,
-        subject: 'New VIP waiting list application — Pizza Contest',
-        text: [
-          'A new application came in for the Colby Ave pizza contest.',
-          '',
-          `Likes pineapple on pizza: ${pineapple === 'yes' ? 'Yes' : 'No'}`,
-          `Submitted: ${new Date().toLocaleString()}`,
-          '',
-          'Photo and payment proof are attached.',
-        ].join('\n'),
-        attachments: [
-          { filename: photo.originalname || 'photo.jpg', content: photo.buffer },
-          { filename: payment.originalname || 'payment-proof.jpg', content: payment.buffer },
-        ],
-      })
-    } catch (err) {
-      console.error('Email notification failed (submission was still saved):', err)
     }
 
     res.json({ ok: true })
