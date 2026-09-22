@@ -60,7 +60,7 @@ This repo includes a `render.yaml` Blueprint that deploys both pieces at once:
 
 - `pizza-colby-api` — the Node backend (`server/`).
 - `pizza-colby-web` — the static frontend build, automatically pointed at the
-  API's hostname via a `VITE_API_HOST` build-time env var.
+  API's public URL via a `VITE_API_URL` build-time env var.
 
 To deploy:
 

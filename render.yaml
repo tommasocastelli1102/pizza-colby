@@ -22,9 +22,10 @@ services:
     env: static
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
+    # Hardcoded rather than fromService: Render's fromService "host" property
+    # returns the private-networking hostname (unresolvable from a browser),
+    # and "url" isn't supported for type: web. Update this if the API
+    # service is ever renamed.
     envVars:
-      - key: VITE_API_HOST
-        fromService:
-          type: web
-          name: pizza-colby-api
-          property: host
+      - key: VITE_API_URL
+        value: https://pizza-colby-api.onrender.com

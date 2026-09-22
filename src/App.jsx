@@ -16,7 +16,7 @@ import chefTommy from './assets/chefs/chef-marco.webp'
 import chefKevin from './assets/chefs/chef-luca.webp'
 import sherlockHarry from './assets/sherlock-harry.webp'
 
-const API_BASE = import.meta.env.VITE_API_HOST ? `https://${import.meta.env.VITE_API_HOST}` : ''
+const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
 const chefs = [
   {
