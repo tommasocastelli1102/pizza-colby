@@ -15,6 +15,7 @@ import {
 import chefTommy from './assets/chefs/chef-marco.webp'
 import chefKevin from './assets/chefs/chef-luca.webp'
 import sherlockHarry from './assets/sherlock-harry.webp'
+import { normalizeImage } from './utils/normalizeImage'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
@@ -136,18 +137,30 @@ function App() {
   const [evaluating, setEvaluating] = useState(false)
   const [evalDone, setEvalDone] = useState(false)
 
-  function handlePhotoChange(e) {
-    const file = e.target.files?.[0] ?? null
+  async function handlePhotoChange(e) {
+    const rawFile = e.target.files?.[0] ?? null
     if (photoPreview) URL.revokeObjectURL(photoPreview)
+    if (!rawFile) {
+      setForm((prev) => ({ ...prev, photo: null }))
+      setPhotoPreview(null)
+      return
+    }
+    const file = await normalizeImage(rawFile)
     setForm((prev) => ({ ...prev, photo: file }))
-    setPhotoPreview(file ? URL.createObjectURL(file) : null)
+    setPhotoPreview(URL.createObjectURL(file))
   }
 
-  function handlePaymentChange(e) {
-    const file = e.target.files?.[0] ?? null
+  async function handlePaymentChange(e) {
+    const rawFile = e.target.files?.[0] ?? null
     if (paymentPreview) URL.revokeObjectURL(paymentPreview)
+    if (!rawFile) {
+      setForm((prev) => ({ ...prev, payment: null }))
+      setPaymentPreview(null)
+      return
+    }
+    const file = await normalizeImage(rawFile)
     setForm((prev) => ({ ...prev, payment: file }))
-    setPaymentPreview(file ? URL.createObjectURL(file) : null)
+    setPaymentPreview(URL.createObjectURL(file))
   }
 
   function handlePineappleChange(value) {
@@ -187,11 +200,18 @@ function App() {
     }
   }
 
-  function handleEvalPhotoChange(e) {
-    const file = e.target.files?.[0] ?? null
+  async function handleEvalPhotoChange(e) {
+    const rawFile = e.target.files?.[0] ?? null
     if (evalPreview) URL.revokeObjectURL(evalPreview)
+    if (!rawFile) {
+      setEvalPhoto(null)
+      setEvalPreview(null)
+      setEvalDone(false)
+      return
+    }
+    const file = await normalizeImage(rawFile)
     setEvalPhoto(file)
-    setEvalPreview(file ? URL.createObjectURL(file) : null)
+    setEvalPreview(URL.createObjectURL(file))
     setEvalDone(false)
   }
 
