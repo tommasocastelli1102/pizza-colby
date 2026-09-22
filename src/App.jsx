@@ -103,15 +103,14 @@ const showdown = [
     category: 'Super Bowl wins',
     italy: '0',
     italyNote: 'has never even been invited',
-    usa: '60',
-    usaNote: 'every single one, obviously — nobody else plays',
+    usa: 'Every single one',
+    usaNote: 'obviously — nobody else plays',
   },
   {
     category: 'Contributions to the world',
     italy: 'The Godfather',
     italyNote: "that's the whole list. Wait... that's an American movie.",
-    usa: 'The airplane, the internet, the moon landing, the personal computer — and pizza',
-    usaNote: 'just faster, bigger, and delivered in 30 minutes or less',
+    usa: 'The airplane, the internet, the moon landing, the personal computer, sharks, probably pizza',
   },
 ]
 
@@ -345,7 +344,7 @@ function App() {
                   <TrophyIcon size={12} />
                   Wins
                 </span>
-                <p className="showdown-note">{row.usaNote}</p>
+                {row.usaNote && <p className="showdown-note">{row.usaNote}</p>}
               </div>
               <div className="showdown-col showdown-col-italy">
                 {row.flag && <ItalyFlag className="showdown-flag" />}
