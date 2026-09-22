@@ -9,6 +9,8 @@ import {
   PizzaIcon,
   TrophyIcon,
   CameraIcon,
+  ItalyFlag,
+  USAFlag,
 } from './components/Decor'
 import chefTommy from './assets/chefs/chef-marco.webp'
 import chefKevin from './assets/chefs/chef-luca.webp'
@@ -17,14 +19,14 @@ import sherlockHarry from './assets/sherlock-harry.webp'
 const chefs = [
   {
     id: 1,
-    name: 'Tommy',
+    name: 'Tomato',
     apartment: 'PH4',
     img: chefTommy,
     quote: 'Born in Italy, raised on wood-fired dough. There is no other way.',
-    specialty: 'Neapolitan Margherita & wood-fired classics',
+    specialty: 'Neapolitan Margherita & wood-fired classics, wears fake Gucci glasses',
     rating: 5,
     reviews: 32,
-    tags: ['Italian', 'Wood-fired', "Nonna's recipe"],
+    tags: ['Italian', 'Wood-fired', "Nonna's recipe", 'Fake Gucci glasses'],
   },
   {
     id: 2,
@@ -36,6 +38,80 @@ const chefs = [
     rating: 3,
     reviews: 21,
     tags: ['White pizza', 'Seasonal', 'Certified loser'],
+  },
+]
+
+const showdown = [
+  {
+    category: 'Land area',
+    italy: '~500 billion square Parmesan blocks',
+    italyNote: 'about the size of a mall parking lot, give or take',
+    usa: '3,796,742 sq mi',
+    usaNote: 'roughly 1,700 Italys',
+  },
+  {
+    category: 'Flag',
+    italy: 'Often gets confused with Mexico and Iran',
+    italyNote: 'same green-white-red, different logo. An honest mistake, made constantly.',
+    usa: 'Has a cool flag',
+    usaNote: 'unmistakable, everywhere, immediately recognizable',
+    flag: true,
+  },
+  {
+    category: 'GDP',
+    italy: '~4.6 trillion meatballs',
+    italyNote: '$2.3 trillion, converted to the only unit that felt appropriate (at $0.50/meatball)',
+    usa: '$27+ trillion',
+    usaNote: 'measured in an actual currency, because it is an actual economy',
+  },
+  {
+    category: 'Biggest company',
+    italyCompanies: ["Domino's Pizza"],
+    italyNote: "honestly not sure they even have computers over there",
+    usaCompanies: [
+      'Apple',
+      'Microsoft',
+      'Nvidia',
+      'Alphabet',
+      'Amazon',
+      'Meta',
+      'Broadcom',
+      'Tesla',
+      'Oracle',
+      'Berkshire Hathaway',
+      'SpaceX',
+      'OpenAI',
+      'Anthropic',
+    ],
+    usaNote: 'a combined $20+ trillion, and — not to be dramatic — basically responsible for all progress in the modern world',
+  },
+  {
+    category: 'World wars won',
+    italy: '-1',
+    italyNote: 'switched sides mid-war. Twice. Was really, really on the wrong side for most of it.',
+    usa: '2',
+    usaNote: 'back to back, no switching sides required',
+  },
+  {
+    category: 'Made the 2026 World Cup',
+    italy: 'No',
+    italyNote: 'didn’t qualify, meanwhile Curaçao and Cabo Verde made their World Cup debut',
+    usa: 'Yes',
+    usaNote: "pretty sure we won? Didn't really watch it",
+  },
+  {
+    category: 'Super Bowl wins',
+    italy: '0',
+    italyNote: 'has never even been invited',
+    usa: '60',
+    usaNote: 'every single one, obviously — nobody else plays',
+  },
+  {
+    category: 'Contributions to the world',
+    italy: 'The Godfather',
+    italyNote: "that's the whole list. Wait... that's an American movie.",
+    usa: 'The airplane, the internet, the moon landing, the personal computer — and pizza',
+    usaNote: 'just faster, bigger, and delivered in 30 minutes or less',
   },
 ]
 
@@ -223,6 +299,77 @@ function App() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="showdown">
+        <h2>Italy vs. USA: the real contest</h2>
+        <p className="section-subtitle">
+          Before anyone votes on dough, let&apos;s settle the bigger rivalry. Numbers don&apos;t lie.
+        </p>
+
+        <div className="showdown-scoreboard">
+          <div className="showdown-score showdown-score-usa">
+            <span className="showdown-score-value">{showdown.length}</span>
+            <span className="showdown-score-label">USA</span>
+          </div>
+          <span className="showdown-score-divider">&mdash;</span>
+          <div className="showdown-score showdown-score-italy">
+            <span className="showdown-score-value">0</span>
+            <span className="showdown-score-label">Italy</span>
+          </div>
+        </div>
+
+        <div className="showdown-table">
+          <div className="showdown-header">
+            <span />
+            <span className="showdown-header-usa">USA</span>
+            <span>Italy</span>
+          </div>
+          {showdown.map((row) => (
+            <div className="showdown-row" key={row.category}>
+              <h3 className="showdown-category">{row.category}</h3>
+              <div className="showdown-col showdown-col-usa">
+                {row.flag && <USAFlag className="showdown-flag" />}
+                {row.usaCompanies ? (
+                  <div className="showdown-chips">
+                    {row.usaCompanies.map((company) => (
+                      <span className="showdown-chip" key={company}>
+                        {company}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="showdown-value">{row.usa}</p>
+                )}
+                <span className="showdown-winner-badge">
+                  <TrophyIcon size={12} />
+                  Wins
+                </span>
+                <p className="showdown-note">{row.usaNote}</p>
+              </div>
+              <div className="showdown-col showdown-col-italy">
+                {row.flag && <ItalyFlag className="showdown-flag" />}
+                {row.italyCompanies ? (
+                  <div className="showdown-chips">
+                    {row.italyCompanies.map((company) => (
+                      <span className="showdown-chip" key={company}>
+                        {company}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="showdown-value">{row.italy}</p>
+                )}
+                <p className="showdown-note">{row.italyNote}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="showdown-conclusion">
+          Italy gave the world flavor and a Coppola movie. America gave the world
+          everything else, won the wars that mattered, and then perfected the
+          flavor too.
+        </p>
       </section>
 
       <section className="detective">

@@ -147,6 +147,55 @@ export function CameraIcon({ className, size = 26 }) {
   )
 }
 
+export function ItalyFlag({ className, size = 48 }) {
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={size * 0.67}
+      viewBox="0 0 45 30"
+      aria-hidden="true"
+    >
+      <rect x="0" y="0" width="15" height="30" fill="#009246" />
+      <rect x="15" y="0" width="15" height="30" fill="#f1f2f1" />
+      <rect x="30" y="0" width="15" height="30" fill="#ce2b37" />
+      <rect x="0.75" y="0.75" width="43.5" height="28.5" fill="none" stroke="var(--line)" strokeWidth="1" />
+    </svg>
+  )
+}
+
+export function USAFlag({ className, size = 48 }) {
+  const stripeHeight = 30 / 13
+  const stripes = Array.from({ length: 13 }, (_, i) => (
+    <rect
+      key={i}
+      x="0"
+      y={i * stripeHeight}
+      width="45"
+      height={stripeHeight}
+      fill={i % 2 === 0 ? '#b22234' : '#f1f2f1'}
+    />
+  ))
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={size * 0.67}
+      viewBox="0 0 45 30"
+      aria-hidden="true"
+    >
+      {stripes}
+      <rect x="0" y="0" width="18" height="16.15" fill="#3c3b6e" />
+      {[3, 6.5, 10, 13.5].map((cy) =>
+        [3, 7, 11, 15].map((cx) => (
+          <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="0.7" fill="#f1f2f1" />
+        )),
+      )}
+      <rect x="0.75" y="0.75" width="43.5" height="28.5" fill="none" stroke="var(--line)" strokeWidth="1" />
+    </svg>
+  )
+}
+
 function Star({ filled }) {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
