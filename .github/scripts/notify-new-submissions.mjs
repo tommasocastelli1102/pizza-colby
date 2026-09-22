@@ -11,14 +11,21 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 })
 
+const smtpUser = (process.env.SMTP_USER || '').trim()
+const smtpPass = (process.env.SMTP_PASS || '').trim()
+// Lengths (not the values) are safe to log: GitHub masks exact secret matches
+// in Action logs, so this is how we can tell a pasted secret has a stray
+// space/newline without ever printing the credential itself.
+console.log(`SMTP_USER length: ${smtpUser.length}, SMTP_PASS length: ${smtpPass.length}`)
+
 const smtpPort = Number(process.env.SMTP_PORT) || 587
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: smtpPort,
   secure: smtpPort === 465,
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: smtpUser,
+    pass: smtpPass,
   },
 })
 
@@ -36,7 +43,7 @@ const adminLink = `${API_URL}/admin?key=${encodeURIComponent(process.env.ADMIN_K
 
 for (const row of rows) {
   await transporter.sendMail({
-    from: process.env.SMTP_USER,
+    from: smtpUser,
     to: RECIPIENTS,
     subject: `New VIP waiting list application #${row.id} — Pizza Contest`,
     text: [
