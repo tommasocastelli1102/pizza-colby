@@ -149,8 +149,14 @@ function App() {
   return (
     <>
       <header className="hero">
-        <TomatoSprig className="decor decor-hero-1" size={64} />
-        <BasilSprig className="decor decor-hero-2" size={72} />
+        <div className="hero-bg" aria-hidden="true">
+          <TomatoSprig className="decor decor-hero-1" size={64} />
+          <TomatoSprig className="decor decor-hero-3" size={44} />
+          <TomatoSprig className="decor decor-hero-4" size={52} />
+          <TomatoSprig className="decor decor-hero-5" size={38} />
+          <BasilSprig className="decor decor-hero-2" size={72} />
+          <BasilSprig className="decor decor-hero-6" size={56} />
+        </div>
         <p className="eyebrow">
           <span className="rule" /> Building Pizza Night <span className="rule" />
         </p>
@@ -159,11 +165,6 @@ function App() {
           <br />
           <em>Pizza Contest</em>
         </h1>
-        <p className="tagline">
-          One building, one night, endless toppings. Bring your best homemade pizza,
-          compete for bragging rights, and help us crown this year&apos;s Pizza Champion
-          of the building.
-        </p>
         <a className="cta" href="#join">
           Join the VIP waiting list
         </a>
@@ -175,7 +176,7 @@ function App() {
           <div className="card">
             <CalendarIcon className="card-icon" />
             <h3>When</h3>
-            <p>Saturday, October 18th, starting at 6:00 PM</p>
+            <p>Always next Sunday, 6:00 PM</p>
           </div>
           <div className="card">
             <PinIcon className="card-icon" />
@@ -185,12 +186,12 @@ function App() {
           <div className="card">
             <PizzaIcon className="card-icon" />
             <h3>What to bring</h3>
-            <p>One homemade pizza, ready to slice and share with the building</p>
+            <p>A plant, an horse or a dwarf</p>
           </div>
           <div className="card">
             <TrophyIcon className="card-icon" />
             <h3>Prizes</h3>
-            <p>Neighbors vote by tasting — top three pizzas win bragging rights and prizes</p>
+            <p>The two chefs are the prize!</p>
           </div>
         </div>
       </section>

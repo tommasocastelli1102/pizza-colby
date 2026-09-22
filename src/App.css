@@ -22,6 +22,22 @@
   overflow: hidden;
 }
 
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-bg .decor {
+  opacity: 0.4;
+}
+
+.hero > *:not(.hero-bg) {
+  position: relative;
+  z-index: 1;
+}
+
 .decor-hero-1 {
   top: 56px;
   left: 7%;
@@ -30,6 +46,26 @@
 .decor-hero-2 {
   top: 48px;
   right: 9%;
+}
+.decor-hero-3 {
+  bottom: 18%;
+  left: 15%;
+  transform: rotate(14deg);
+}
+.decor-hero-4 {
+  top: 12%;
+  right: 22%;
+  transform: rotate(-20deg);
+}
+.decor-hero-5 {
+  bottom: 10%;
+  right: 6%;
+  transform: rotate(6deg);
+}
+.decor-hero-6 {
+  bottom: 6%;
+  left: 40%;
+  transform: rotate(-10deg);
 }
 
 .eyebrow {
@@ -47,14 +83,6 @@
 h1 em {
   font-style: italic;
   color: var(--terracotta);
-}
-
-.tagline {
-  max-width: 560px;
-  margin: 28px auto 0;
-  color: var(--ink-soft);
-  font-size: 18px;
-  line-height: 1.7;
 }
 
 .cta {
