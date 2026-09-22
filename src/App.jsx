@@ -236,7 +236,9 @@ function App() {
 
             {evalDone ? (
               <div className="verdict">
-                <p className="verdict-text">&ldquo;It&apos;s not good enough, Watson.&rdquo;</p>
+                <p className="verdict-text">
+                  &ldquo;It&apos;s not good enough, Watson. You should eat some cereals instead.&rdquo;
+                </p>
                 <button type="button" className="secondary" onClick={handleEvalReset}>
                   Try again
                 </button>
