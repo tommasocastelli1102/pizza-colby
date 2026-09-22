@@ -75,3 +75,12 @@ To deploy:
 4. Redeploy `pizza-colby-api` after adding those (Render prompts for this).
 
 Both services auto-deploy on every push to `main` from then on.
+
+### Avoiding cold starts
+
+Render's free web-service plan spins the backend down after ~15 minutes of no
+traffic; the next request then has to wait 30–90+ seconds for it to wake back
+up. `.github/workflows/keep-alive.yml` pings the backend's health check every
+10 minutes via GitHub Actions to keep it warm, so real submissions don't hit a
+cold start. For a guarantee (not just "very likely warm"), upgrade
+`pizza-colby-api` to a paid Render plan instead — those don't spin down.
