@@ -509,6 +509,12 @@ h1 em {
   margin-top: 18px;
 }
 
+.detective-body .error {
+  display: block;
+  margin-top: 10px;
+  color: #ff9d85;
+}
+
 .verdict-text {
   font-family: var(--display);
   font-style: italic;

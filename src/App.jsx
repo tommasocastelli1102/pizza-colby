@@ -15,9 +15,11 @@ import {
 import chefTommy from './assets/chefs/chef-marco.webp'
 import chefKevin from './assets/chefs/chef-luca.webp'
 import sherlockHarry from './assets/sherlock-harry.webp'
-import { normalizeImage } from './utils/normalizeImage'
+import { normalizeImage, ImageDecodeError } from './utils/normalizeImage'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? ''
+const UNREADABLE_IMAGE_MESSAGE =
+  "This browser couldn't open that image. Try a different photo, or a screenshot of it instead."
 
 const chefs = [
   {
@@ -136,6 +138,7 @@ function App() {
   const [evalPreview, setEvalPreview] = useState(null)
   const [evaluating, setEvaluating] = useState(false)
   const [evalDone, setEvalDone] = useState(false)
+  const [evalError, setEvalError] = useState('')
 
   async function handlePhotoChange(e) {
     const rawFile = e.target.files?.[0] ?? null
@@ -145,9 +148,21 @@ function App() {
       setPhotoPreview(null)
       return
     }
-    const file = await normalizeImage(rawFile)
-    setForm((prev) => ({ ...prev, photo: file }))
-    setPhotoPreview(URL.createObjectURL(file))
+    try {
+      const file = await normalizeImage(rawFile)
+      setForm((prev) => ({ ...prev, photo: file }))
+      setPhotoPreview(URL.createObjectURL(file))
+      setErrors((prev) => ({ ...prev, photo: undefined }))
+    } catch (err) {
+      setForm((prev) => ({ ...prev, photo: null }))
+      setPhotoPreview(null)
+      setErrors((prev) => ({
+        ...prev,
+        photo: err instanceof ImageDecodeError ? UNREADABLE_IMAGE_MESSAGE : 'Please try a different photo.',
+      }))
+    } finally {
+      e.target.value = ''
+    }
   }
 
   async function handlePaymentChange(e) {
@@ -158,9 +173,21 @@ function App() {
       setPaymentPreview(null)
       return
     }
-    const file = await normalizeImage(rawFile)
-    setForm((prev) => ({ ...prev, payment: file }))
-    setPaymentPreview(URL.createObjectURL(file))
+    try {
+      const file = await normalizeImage(rawFile)
+      setForm((prev) => ({ ...prev, payment: file }))
+      setPaymentPreview(URL.createObjectURL(file))
+      setErrors((prev) => ({ ...prev, payment: undefined }))
+    } catch (err) {
+      setForm((prev) => ({ ...prev, payment: null }))
+      setPaymentPreview(null)
+      setErrors((prev) => ({
+        ...prev,
+        payment: err instanceof ImageDecodeError ? UNREADABLE_IMAGE_MESSAGE : 'Please try a different photo.',
+      }))
+    } finally {
+      e.target.value = ''
+    }
   }
 
   function handlePineappleChange(value) {
@@ -209,10 +236,19 @@ function App() {
       setEvalDone(false)
       return
     }
-    const file = await normalizeImage(rawFile)
-    setEvalPhoto(file)
-    setEvalPreview(URL.createObjectURL(file))
-    setEvalDone(false)
+    try {
+      const file = await normalizeImage(rawFile)
+      setEvalPhoto(file)
+      setEvalPreview(URL.createObjectURL(file))
+      setEvalDone(false)
+      setEvalError('')
+    } catch (err) {
+      setEvalPhoto(null)
+      setEvalPreview(null)
+      setEvalError(err instanceof ImageDecodeError ? UNREADABLE_IMAGE_MESSAGE : 'Please try a different photo.')
+    } finally {
+      e.target.value = ''
+    }
   }
 
   function handleEvaluate() {
@@ -230,6 +266,7 @@ function App() {
     setEvalPreview(null)
     setEvaluating(false)
     setEvalDone(false)
+    setEvalError('')
   }
 
   function handleReset() {
@@ -437,6 +474,7 @@ function App() {
                     className="upload-input"
                   />
                 </div>
+                {evalError && <span className="error">{evalError}</span>}
                 <button
                   type="button"
                   className="primary"
