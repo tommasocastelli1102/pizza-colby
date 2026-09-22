@@ -102,8 +102,14 @@ app.get('/admin', requireAdminKey, async (req, res) => {
     .map(
       (r) => `
         <div class="row">
-          <img src="/admin/photo/${r.id}/photo?key=${key}" alt="Applicant photo" />
-          <img src="/admin/photo/${r.id}/payment?key=${key}" alt="Payment proof" />
+          <figure>
+            <img src="/admin/photo/${r.id}/photo?key=${key}" alt="Applicant photo" />
+            <a href="/admin/photo/${r.id}/photo?key=${key}&download=1" download>Download</a>
+          </figure>
+          <figure>
+            <img src="/admin/photo/${r.id}/payment?key=${key}" alt="Payment proof" />
+            <a href="/admin/photo/${r.id}/payment?key=${key}&download=1" download>Download</a>
+          </figure>
           <div>
             <strong>#${r.id}</strong> — ${new Date(r.created_at).toLocaleString()}<br />
             Likes pineapple: ${r.pineapple === 'yes' ? 'Yes' : 'No'}
@@ -120,7 +126,10 @@ app.get('/admin', requireAdminKey, async (req, res) => {
         <style>
           body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; color: #2c2620; }
           .row { display: flex; gap: 16px; align-items: center; padding: 14px 0; border-bottom: 1px solid #e3d7bd; }
-          .row img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; }
+          .row figure { margin: 0; text-align: center; }
+          .row img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; display: block; }
+          .row figure a { font-size: 12px; color: #b6532f; text-decoration: none; }
+          .row figure a:hover { text-decoration: underline; }
         </style>
       </head>
       <body>
@@ -143,7 +152,14 @@ app.get('/admin/photo/:id/:field', requireAdminKey, async (req, res) => {
   )
   if (!rows[0]) return res.status(404).send('Not found.')
 
-  res.set('Content-Type', rows[0].type || 'application/octet-stream')
+  const type = rows[0].type || 'application/octet-stream'
+  res.set('Content-Type', type)
+
+  if (req.query.download) {
+    const extension = type.split('/')[1]?.split('+')[0] || 'bin'
+    res.set('Content-Disposition', `attachment; filename="submission-${id}-${field}.${extension}"`)
+  }
+
   res.send(rows[0].data)
 })
 
