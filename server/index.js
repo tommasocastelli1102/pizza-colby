@@ -69,7 +69,7 @@ const app = express()
 app.use(cors())
 
 app.get('/', (req, res) => {
-  res.json({ ok: true })
+  res.json({ ok: true, database: Boolean(pool), email: Boolean(process.env.SMTP_USER) })
 })
 
 app.post(
