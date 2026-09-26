@@ -1278,3 +1278,207 @@ button.secondary {
     padding: 11px 16px;
   }
 }
+
+/* Mobile: tighter vertical rhythm */
+@media (max-width: 640px) {
+  h1 {
+    font-size: 32px;
+    line-height: 1.08;
+  }
+
+  .hero {
+    padding: 40px 16px 36px;
+  }
+
+  .eyebrow {
+    margin-bottom: 12px;
+  }
+
+  .cta {
+    margin-top: 22px;
+    padding: 13px 26px;
+  }
+
+  .details,
+  .chefs,
+  .showdown,
+  .reviews,
+  .detective,
+  .agent,
+  .join,
+  .faq {
+    padding: 32px 16px;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+
+  .section-subtitle {
+    margin-top: 8px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .cards,
+  .chef-cards,
+  .review-cards,
+  .faq-list,
+  .join-form,
+  .success {
+    margin-top: 20px;
+  }
+
+  .chef-cards {
+    gap: 14px;
+  }
+
+  .chef-card {
+    padding: 20px 16px 16px;
+  }
+
+  .chef-photo-wrap {
+    width: 84px;
+    height: 84px;
+    margin-bottom: 10px;
+  }
+
+  .chef-card h3 {
+    font-size: 20px;
+  }
+
+  .chef-apartment {
+    margin-bottom: 8px;
+  }
+
+  .star-rating {
+    margin-bottom: 10px;
+  }
+
+  .chef-quote {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .chef-specialty {
+    margin-bottom: 10px;
+  }
+
+  .chef-tag {
+    padding: 4px 9px;
+  }
+
+  .collapse-toggle {
+    margin-top: 16px;
+    padding: 10px 22px;
+  }
+
+  .showdown-scoreboard {
+    margin-top: 20px;
+  }
+
+  .showdown-table {
+    margin-top: 20px;
+  }
+
+  .showdown-row {
+    padding: 12px;
+  }
+
+  .showdown-conclusion {
+    margin-top: 22px;
+    font-size: 17px;
+  }
+
+  .reviews-summary {
+    margin-top: 10px;
+  }
+
+  .review-cards {
+    gap: 14px;
+  }
+
+  .review-card {
+    padding: 16px;
+  }
+
+  .review-header {
+    margin-bottom: 10px;
+  }
+
+  .review-meta {
+    margin-bottom: 8px;
+  }
+
+  .review-title {
+    font-size: 17px;
+  }
+
+  .review-date {
+    margin-top: 10px;
+  }
+
+  .load-more {
+    margin-top: 18px;
+  }
+
+  .review-form {
+    margin-top: 20px;
+  }
+
+  .detective-card {
+    gap: 14px;
+  }
+
+  .detective-photo {
+    width: 104px;
+    height: 104px;
+  }
+
+  .detective-body .upload {
+    margin-top: 14px;
+  }
+
+  .detective-body button.primary {
+    margin-top: 12px;
+  }
+
+  .new-badge {
+    margin-bottom: 10px;
+  }
+
+  .agent-phone {
+    margin-top: 18px;
+    padding: 11px 22px;
+    font-size: 21px;
+  }
+
+  .agent-note {
+    margin-top: 12px;
+  }
+
+  .join-form {
+    gap: 18px;
+  }
+
+  .upload {
+    padding: 10px;
+  }
+
+  .faq-list {
+    gap: 10px;
+  }
+
+  .faq-item summary {
+    padding: 14px 16px;
+    font-size: 16px;
+  }
+
+  .faq-answer {
+    padding: 0 16px 16px;
+  }
+
+  .footer {
+    padding: 18px 16px;
+  }
+}
