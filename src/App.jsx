@@ -33,6 +33,7 @@ const chefs = [
     specialty: 'Neapolitan Margherita & wood-fired classics, wears fake Gucci glasses',
     rating: 5,
     reviews: 32,
+    michelinStars: 3,
     tags: ['Italian', 'Wood-fired', "Nonna's recipe", 'Fake Gucci glasses'],
   },
   {
@@ -44,6 +45,7 @@ const chefs = [
     specialty: 'Gourmet white pizzas with seasonal toppings',
     rating: 3,
     reviews: 21,
+    michelinStars: 5,
     tags: ['Graduated', 'Canadian business school', 'Maximum grade'],
   },
 ]
@@ -121,23 +123,6 @@ const showdown = [
   },
 ]
 
-const michelin = [
-  {
-    chef: 'Kevin',
-    img: chefKevin,
-    stars: 5,
-    distinction: 'Exceptional cuisine, worth a special journey. And a second mortgage.',
-    note: 'The Guide only goes up to three stars. The inspectors made an exception, then printed a new edition.',
-  },
-  {
-    chef: 'Tomato',
-    img: chefTommy,
-    stars: 3,
-    distinction: 'Exceptional cuisine, worth a special journey. Just a shorter one.',
-    note: 'A perfect score, the highest the Guide allows. Unfortunately for Tomato, Kevin got five.',
-  },
-]
-
 const testimonials = [
   {
     title: 'I used to be poor. Now I drive a Lamborghini.',
@@ -183,13 +168,6 @@ const testimonials = [
 const STAR_PRICE_MULTIPLIER = 1.8 // each extra Michelin star ≈ 1.8x the tasting menu price
 const AVOIDED_COSTS = 1340 // flight to Paris, 3-month reservation wait, valet, coat check
 const PLACEBO_MULTIPLIER = 1.5 // food you paid more for tastes 1.5x better (science)
-const benchmarks = [
-  { label: 'Cheap 3★', price: 300 },
-  { label: 'Typical 3★', price: 500 },
-  { label: 'Paris 3★', price: 800 },
-]
-const paymentLevels = [100, 250, 500, 1000, 1500, 2000]
-
 function kevinMealValue(benchmarkPrice) {
   // Kevin has 5 stars; extrapolate from a 3-star tasting menu
   return benchmarkPrice * STAR_PRICE_MULTIPLIER ** 2
@@ -215,6 +193,9 @@ function App() {
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
+  const [price, setPrice] = useState(100)
+  const [promoCode, setPromoCode] = useState('')
+  const [promoMessage, setPromoMessage] = useState('')
 
   const [evalPhoto, setEvalPhoto] = useState(null)
   const [evalPreview, setEvalPreview] = useState(null)
@@ -281,6 +262,15 @@ function App() {
     }
   }
 
+  function handlePromoSubmit() {
+    if (!promoCode.trim()) return
+    // Every code is valid. Every code doubles the price.
+    const next = price * 2
+    setPrice(next)
+    setPromoMessage(`Promo code “${promoCode.trim()}” applied! Your new price is ${usd(next)}.`)
+    setPromoCode('')
+  }
+
   function handlePineappleChange(value) {
     setForm((prev) => ({ ...prev, pineapple: value }))
   }
@@ -288,7 +278,7 @@ function App() {
   function validate(values) {
     const next = {}
     if (!values.photo) next.photo = 'Please add a photo of yourself.'
-    if (!values.payment) next.payment = 'Please attach proof of your $100+ Venmo payment.'
+    if (!values.payment) next.payment = `Please attach proof of your ${usd(price)}+ Venmo payment.`
     if (!values.pineapple) next.pineapple = 'Please answer the question.'
     return next
   }
@@ -495,34 +485,14 @@ function App() {
                   </span>
                 ))}
               </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="michelin">
-        <div className="michelin-brand">
-          <MichelinStar size={34} />
-          <div className="michelin-wordmark">
-            <span className="michelin-name">MICHELIN</span>
-            <span className="michelin-guide">Guide &middot; Colby Ave 2026</span>
-          </div>
-        </div>
-        <h2>The stars are in</h2>
-        <p className="section-subtitle michelin-subtitle">
-          Our anonymous inspectors ate at PH4 on multiple Sundays. Their findings are final.
-        </p>
-        <div className="michelin-cards">
-          {michelin.map((entry) => (
-            <div className="michelin-card" key={entry.chef}>
-              <img src={entry.img} alt={entry.chef} className="michelin-photo" />
-              <h3>Chef {entry.chef}</h3>
-              <MichelinRating stars={entry.stars} max={3} />
-              <p className="michelin-score">
-                {entry.stars} / 3 Michelin stars
-              </p>
-              <p className="michelin-distinction">{entry.distinction}</p>
-              <p className="michelin-note">{entry.note}</p>
+              <div className="chef-michelin">
+                <span className="chef-michelin-label">
+                  <MichelinStar size={14} />
+                  MICHELIN
+                </span>
+                <MichelinRating stars={chef.michelinStars} max={3} size={20} />
+                <span className="chef-michelin-score">{chef.michelinStars} / 3</span>
+              </div>
             </div>
           ))}
         </div>
@@ -804,9 +774,36 @@ function App() {
             </div>
 
             <div className="field">
-              <label htmlFor="payment">Proof of Venmo payment ($100 minimum)</label>
+              <label htmlFor="promoCode">Promo code</label>
+              <div className="promo">
+                <input
+                  id="promoCode"
+                  type="text"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      handlePromoSubmit()
+                    }
+                  }}
+                  placeholder="Enter code"
+                />
+                <button type="button" className="secondary promo-apply" onClick={handlePromoSubmit} disabled={!promoCode.trim()}>
+                  Apply
+                </button>
+              </div>
+              {promoMessage && (
+                <p className="promo-message" role="status">
+                  {promoMessage}
+                </p>
+              )}
+            </div>
+
+            <div className="field">
+              <label htmlFor="payment">Proof of Venmo payment ({usd(price)} minimum)</label>
               <p className="field-hint">
-                Send $100+ to{' '}
+                Send {usd(price)}+ to{' '}
                 <a href="https://venmo.com/u/Tommaso-Castelli" target="_blank" rel="noopener noreferrer">
                   @Tommaso-Castelli
                 </a>{' '}
@@ -918,36 +915,6 @@ function App() {
                 </p>
               </div>
 
-              <p className="faq-table-caption">
-                Sensitivity analysis: your profit by amount paid and 3★ tasting-menu benchmark
-              </p>
-              <div className="faq-table-wrap">
-                <table className="faq-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">You pay</th>
-                      {benchmarks.map((b) => (
-                        <th scope="col" key={b.label}>
-                          {b.label}
-                          <span>{usd(b.price)}/head</span>
-                        </th>
-                      ))}
-                      <th scope="col">ROI (typical)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paymentLevels.map((pay) => (
-                      <tr key={pay}>
-                        <th scope="row">{usd(pay)}</th>
-                        {benchmarks.map((b) => (
-                          <td key={b.label}>+{usd(profitFor(pay, b.price))}</td>
-                        ))}
-                        <td>{Math.round((profitFor(pay, 500) / pay) * 100).toLocaleString('en-US')}%</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
               <p className="faq-punchline">
                 Note that profit goes <em>up</em> the more you pay. That&apos;s not a typo.
                 That&apos;s economics. Please consult no financial advisor.
