@@ -126,6 +126,13 @@ const showdown = [
 
 const testimonials = [
   {
+    title: 'The best pizza of my life',
+    body: 'The pizza was absolutely amazing. I ate three and still wanted more. I was so excited about my lunch that I showed the app to my date that evening, and you know what?\nThe pizza was only the second-best “meal” I had that night.\nHighly recommended. I’d happily pay more next time.',
+    note: 'Our pizza app cares about privacy. For this reason, the gender of Sherlock Harry’s date will not be disclosed.',
+    date: 'September 20, 2026',
+    location: 'Los Angeles, CA',
+  },
+  {
     title: 'I used to be poor. Now I drive a Lamborghini.',
     body: 'Before I joined the VIP waiting list I was sleeping in a bathtub and eating crackers I found in a parking garage. Three weeks after my first slice I was driving a lime-green Lamborghini Huracán, and my wife — a former Miss Universe runner-up — says she married me for my palate. She is lying. It was the Lamborghini. And the Lamborghini was the pizza.',
     date: 'March 3, 2026',
@@ -155,21 +162,9 @@ const testimonials = [
     date: 'July 30, 2026',
     location: 'Beverly Hills, CA',
   },
-  {
-    title: 'The best pizza of my life',
-    body: 'The pizza was absolutely amazing. I ate three and still wanted more. I was so excited about my lunch that I showed the app to my date that evening, and you know what?\nThe pizza was only the second-best “meal” I had that night.\nHighly recommended. I’d happily pay more next time.',
-    note: 'Our pizza app cares about privacy. For this reason, the gender of Sherlock Harry’s date will not be disclosed.',
-    date: 'September 20, 2026',
-    location: 'Los Angeles, CA',
-  },
 ]
 
-// Reviews with a named author (Sherlock "6.3 inches" Harry) lead the list;
-// only the first one shows until "Load more reviews" is pressed.
-const orderedTestimonials = [
-  ...testimonials.filter((t) => t.author),
-  ...testimonials.filter((t) => !t.author),
-]
+// Only the first review shows until "Load more reviews" is pressed.
 
 // Sensitivity analysis assumptions
 const STAR_PRICE_MULTIPLIER = 1.8 // each extra Michelin star ≈ 1.8x the tasting menu price
@@ -600,12 +595,12 @@ function App() {
           </p>
         </div>
         <div className="review-cards">
-          {(showAllReviews ? orderedTestimonials : orderedTestimonials.slice(0, 1)).map((review) => (
+          {(showAllReviews ? testimonials : testimonials.slice(0, 1)).map((review) => (
             <article className="review-card" key={review.title}>
               <div className="review-header">
                 <img src={sherlockHarry} alt="" className="review-avatar" />
                 <div>
-                  <p className="review-author">{review.author ?? 'Sherlock Harry'}</p>
+                  <p className="review-author">Sherlock Harry</p>
                   <p className="review-location">{review.location}</p>
                 </div>
               </div>
@@ -621,9 +616,9 @@ function App() {
           ))}
         </div>
 
-        {!showAllReviews && orderedTestimonials.length > 1 && (
+        {!showAllReviews && testimonials.length > 1 && (
           <button type="button" className="secondary load-more" onClick={() => setShowAllReviews(true)}>
-            Load more reviews ({orderedTestimonials.length - 1})
+            Load more reviews ({testimonials.length - 1})
           </button>
         )}
 
