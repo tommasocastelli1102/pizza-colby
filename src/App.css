@@ -535,6 +535,59 @@ h1 em {
   }
 }
 
+/* AI phone agent */
+.agent {
+  padding: 72px 24px;
+  background: var(--cream-deep);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.new-badge {
+  display: inline-block;
+  margin-bottom: 18px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--terracotta);
+  color: #fffcf5;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.agent-copy {
+  max-width: 560px;
+}
+
+.agent-phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 28px;
+  padding: 14px 30px;
+  border: 1px solid var(--terracotta);
+  border-radius: 3px;
+  color: var(--terracotta-deep);
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.agent-phone:hover {
+  background: var(--terracotta);
+  color: #fffcf5;
+}
+
+.agent-note {
+  margin-top: 20px;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
 /* Join form */
 .join-form {
   max-width: 460px;

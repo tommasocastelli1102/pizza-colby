@@ -9,6 +9,7 @@ import {
   PizzaIcon,
   TrophyIcon,
   CameraIcon,
+  PhoneIcon,
   ItalyFlag,
   USAFlag,
 } from './components/Decor'
@@ -487,6 +488,22 @@ function App() {
             )}
           </div>
         </div>
+      </section>
+
+      <section className="agent">
+        <span className="new-badge">New</span>
+        <h2>Do you have questions?</h2>
+        <p className="section-subtitle agent-copy">
+          We&apos;ve created an AI phone agent that can answer all your questions about pizza
+          and everything else, including personal matters and the price elasticity of cereals.
+        </p>
+        <a className="agent-phone" href="tel:+19257719955">
+          <PhoneIcon size={22} />
+          <span>+1 (925) 771-9955</span>
+        </a>
+        <p className="agent-note">
+          It works 24 hours a day, but its best performances are in the middle of the night.
+        </p>
       </section>
 
       <section id="join" className="join">
