@@ -1,3 +1,5 @@
+import { useId } from 'react'
+
 export function TomatoSprig({ className, size = 56 }) {
   return (
     <svg
@@ -216,6 +218,37 @@ export function StarRating({ rating, max = 5 }) {
     <div className="star-rating" aria-label={`${rating} out of ${max} stars`}>
       {stars.map((filled, i) => (
         <Star key={i} filled={filled} />
+      ))}
+    </div>
+  )
+}
+
+export function MichelinStar({ className, size = 40, filled = true }) {
+  const id = useId()
+  return (
+    <svg className={className} width={size} height={size} viewBox="0 0 48 48" aria-hidden="true">
+      <mask id={id}>
+        <rect width="48" height="48" fill="#fff" />
+        <path
+          d="M24 18.5 25.6 21.3 28.8 21.3 27.2 24 28.8 26.7 25.6 26.7 24 29.5 22.4 26.7 19.2 26.7 20.8 24 19.2 21.3 22.4 21.3Z"
+          fill="#000"
+        />
+      </mask>
+      <g mask={`url(#${id})`} fill={filled ? 'var(--michelin)' : 'var(--line)'}>
+        {[0, 60, 120, 180, 240, 300].map((angle) => (
+          <ellipse key={angle} cx="24" cy="13" rx="7.5" ry="10.5" transform={`rotate(${angle} 24 24)`} />
+        ))}
+        <circle cx="24" cy="24" r="9" />
+      </g>
+    </svg>
+  )
+}
+
+export function MichelinRating({ stars, max = 5, size = 40 }) {
+  return (
+    <div className="michelin-rating" aria-label={`${stars} out of ${max} Michelin stars`}>
+      {Array.from({ length: max }, (_, i) => (
+        <MichelinStar key={i} size={size} filled={i < stars} />
       ))}
     </div>
   )

@@ -11,6 +11,8 @@ import {
   CameraIcon,
   ItalyFlag,
   USAFlag,
+  MichelinStar,
+  MichelinRating,
 } from './components/Decor'
 import chefTommy from './assets/chefs/chef-marco.webp'
 import chefKevin from './assets/chefs/chef-luca.webp'
@@ -119,6 +121,84 @@ const showdown = [
   },
 ]
 
+const michelin = [
+  {
+    chef: 'Kevin',
+    img: chefKevin,
+    stars: 5,
+    distinction: 'Exceptional cuisine, worth a special journey. And a second mortgage.',
+    note: 'The first restaurant in history awarded more than three stars. The Guide had to print a new edition.',
+  },
+  {
+    chef: 'Tomato',
+    img: chefTommy,
+    stars: 2,
+    distinction: 'Excellent cooking, worth a detour. A short one.',
+    note: 'Inspectors docked three stars for the fake Gucci glasses. Rules are rules.',
+  },
+]
+
+const testimonials = [
+  {
+    title: 'I used to be poor. Now I drive a Lamborghini.',
+    body: 'Before I joined the VIP waiting list I was sleeping in a bathtub and eating crackers I found in a parking garage. Three weeks after my first slice I was driving a lime-green Lamborghini Huracán, and my wife — a former Miss Universe runner-up — says she married me for my palate. She is lying. It was the Lamborghini. And the Lamborghini was the pizza.',
+    date: 'March 3, 2026',
+    location: 'Monaco (formerly: a bathtub)',
+  },
+  {
+    title: 'Cured my scurvy. Doctors are baffled.',
+    body: 'I spent 22 years at sea with a crew of fellow pirates, surviving on hardtack and grog. My gums were in open revolt. One bite of Kevin’s white pizza and the scurvy simply left. My physician called it “medically impossible” and then asked if I could get him on the waiting list.',
+    date: 'April 17, 2026',
+    location: 'The high seas',
+  },
+  {
+    title: 'I used this website to have sex.',
+    body: 'I will not go into detail. I will only say that I uploaded my photo to the VIP waiting list, and within the hour I was no longer lonely. I don’t fully understand how it happened and I don’t need to. Five stars. Would use this website to have sex again.',
+    date: 'May 9, 2026',
+    location: 'Unit PH4 (briefly)',
+  },
+  {
+    title: 'My father finally said he was proud of me.',
+    body: 'Forty-one years of silence. Then I showed him a screenshot of my $2,000 Venmo payment to Kevin. He wept. He hugged me. He said, “Son, that is the smartest thing you have ever done.” We now eat pizza together every Sunday. Tomato’s pizza makes him cry for different reasons.',
+    date: 'June 22, 2026',
+    location: 'Los Angeles, CA',
+  },
+  {
+    title: 'My credit score went from 412 to 850.',
+    body: 'I did nothing else differently. I didn’t pay off any debt. I just joined the waiting list and the credit bureaus called me personally to apologize. My bank now sends me a fruit basket every Christmas.',
+    date: 'July 30, 2026',
+    location: 'Beverly Hills, CA',
+  },
+  {
+    title: 'I can speak Italian now. I never took a lesson.',
+    body: 'Woke up the morning after my first slice fluent in Italian. Unfortunately I then read the Italy vs. USA section of this website and I have chosen to forget it all out of respect for my country.',
+    date: 'August 14, 2026',
+    location: 'Florence (briefly), then back to LA',
+  },
+]
+
+// Sensitivity analysis assumptions
+const STAR_PRICE_MULTIPLIER = 1.8 // each extra Michelin star ≈ 1.8x the tasting menu price
+const AVOIDED_COSTS = 1340 // flight to Paris, 3-month reservation wait, valet, coat check
+const PLACEBO_MULTIPLIER = 1.5 // food you paid more for tastes 1.5x better (science)
+const benchmarks = [
+  { label: 'Cheap 3★', price: 300 },
+  { label: 'Typical 3★', price: 500 },
+  { label: 'Paris 3★', price: 800 },
+]
+const paymentLevels = [100, 250, 500, 1000, 1500, 2000]
+
+function kevinMealValue(benchmarkPrice) {
+  // Kevin has 5 stars; extrapolate from a 3-star tasting menu
+  return benchmarkPrice * STAR_PRICE_MULTIPLIER ** 2
+}
+
+function profitFor(payment, benchmarkPrice) {
+  return kevinMealValue(benchmarkPrice) + AVOIDED_COSTS + payment * PLACEBO_MULTIPLIER - payment
+}
+
+const usd = (n) => `$${Math.round(n).toLocaleString('en-US')}`
+
 const initialForm = {
   photo: null,
   payment: null,
@@ -139,6 +219,12 @@ function App() {
   const [evaluating, setEvaluating] = useState(false)
   const [evalDone, setEvalDone] = useState(false)
   const [evalError, setEvalError] = useState('')
+
+  const [calcPayment, setCalcPayment] = useState(500)
+  const [receipt, setReceipt] = useState(null)
+  const [receiptPreview, setReceiptPreview] = useState(null)
+  const [receiptStatus, setReceiptStatus] = useState('idle') // idle | sending | sent | error
+  const [receiptError, setReceiptError] = useState('')
 
   async function handlePhotoChange(e) {
     const rawFile = e.target.files?.[0] ?? null
@@ -269,6 +355,45 @@ function App() {
     setEvalError('')
   }
 
+  async function handleReceiptChange(e) {
+    const rawFile = e.target.files?.[0] ?? null
+    if (receiptPreview) URL.revokeObjectURL(receiptPreview)
+    setReceiptStatus('idle')
+    setReceiptError('')
+    if (!rawFile) {
+      setReceipt(null)
+      setReceiptPreview(null)
+      return
+    }
+    try {
+      const file = await normalizeImage(rawFile)
+      setReceipt(file)
+      setReceiptPreview(URL.createObjectURL(file))
+    } catch (err) {
+      setReceipt(null)
+      setReceiptPreview(null)
+      setReceiptError(err instanceof ImageDecodeError ? UNREADABLE_IMAGE_MESSAGE : 'Please try a different photo.')
+    } finally {
+      e.target.value = ''
+    }
+  }
+
+  async function handleReceiptSubmit() {
+    if (!receipt) return
+    setReceiptStatus('sending')
+    setReceiptError('')
+    try {
+      const body = new FormData()
+      body.append('payment', receipt)
+      const res = await fetch(`${API_BASE}/api/receipt`, { method: 'POST', body })
+      if (!res.ok) throw new Error('Request failed')
+      setReceiptStatus('sent')
+    } catch {
+      setReceiptStatus('idle')
+      setReceiptError("Couldn't send your receipt. Please try again.")
+    }
+  }
+
   function handleReset() {
     if (photoPreview) URL.revokeObjectURL(photoPreview)
     if (paymentPreview) URL.revokeObjectURL(paymentPreview)
@@ -303,6 +428,34 @@ function App() {
           Join the VIP waiting list
         </a>
       </header>
+
+      <section className="michelin">
+        <div className="michelin-brand">
+          <MichelinStar size={34} />
+          <div className="michelin-wordmark">
+            <span className="michelin-name">MICHELIN</span>
+            <span className="michelin-guide">Guide &middot; Colby Ave 2026</span>
+          </div>
+        </div>
+        <h2>The stars are in</h2>
+        <p className="section-subtitle michelin-subtitle">
+          Our anonymous inspectors ate at PH4 on multiple Sundays. Their findings are final.
+        </p>
+        <div className="michelin-cards">
+          {michelin.map((entry) => (
+            <div className="michelin-card" key={entry.chef}>
+              <img src={entry.img} alt={entry.chef} className="michelin-photo" />
+              <h3>Chef {entry.chef}</h3>
+              <MichelinRating stars={entry.stars} />
+              <p className="michelin-score">
+                {entry.stars} / 5 Michelin stars
+              </p>
+              <p className="michelin-distinction">{entry.distinction}</p>
+              <p className="michelin-note">{entry.note}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <section className="details">
         <h2>How it works</h2>
@@ -430,6 +583,36 @@ function App() {
         </p>
       </section>
 
+      <section className="reviews">
+        <h2>What our diners are saying</h2>
+        <div className="reviews-summary">
+          <StarRating rating={5} />
+          <p>
+            <strong>5.0</strong> out of 5 &middot; {testimonials.length} verified reviews
+          </p>
+        </div>
+        <div className="review-cards">
+          {testimonials.map((review) => (
+            <article className="review-card" key={review.title}>
+              <div className="review-header">
+                <img src={sherlockHarry} alt="" className="review-avatar" />
+                <div>
+                  <p className="review-author">Sherlock Harry</p>
+                  <p className="review-location">{review.location}</p>
+                </div>
+              </div>
+              <div className="review-meta">
+                <StarRating rating={5} />
+                <span className="review-verified">&#10003; Verified diner</span>
+              </div>
+              <h3 className="review-title">{review.title}</h3>
+              <p className="review-body">{review.body}</p>
+              <p className="review-date">Reviewed {review.date}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="detective">
         <div className="detective-card">
           <img src={sherlockHarry} alt="Sherlock Harry" className="detective-photo" />
@@ -443,7 +626,7 @@ function App() {
             {evalDone ? (
               <div className="verdict">
                 <p className="verdict-text">
-                  &ldquo;It&apos;s not good enough, Watson. You should eat some cereals instead.&rdquo;
+                  &ldquo;It&apos;s not good enough, Watson. You&apos;ll never make it in this town.&rdquo;
                 </p>
                 <button type="button" className="secondary" onClick={handleEvalReset}>
                   Try again
@@ -607,6 +790,148 @@ function App() {
             </button>
           </form>
         )}
+      </section>
+
+      <section className="faq">
+        <h2>Frequently asked questions</h2>
+        <div className="faq-list">
+          <details className="faq-item">
+            <summary>$100 seems like a lot?</summary>
+            <div className="faq-answer">
+              <p>
+                Have you ever eaten at a Michelin-starred restaurant? A three-star tasting
+                menu runs you $300&ndash;$800 a head before wine. Kevin has <em>five</em>{' '}
+                stars. At $100 you aren&apos;t paying for pizza &mdash; you&apos;re
+                basically getting paid to eat it. We ran the numbers.
+              </p>
+
+              <ul className="faq-assumptions">
+                <li>
+                  Each additional Michelin star &asymp; {STAR_PRICE_MULTIPLIER}&times; the price.
+                  Kevin&apos;s 5 stars &rArr; {Math.round((STAR_PRICE_MULTIPLIER ** 2 - 1) * 100)}% above a 3★ menu.
+                </li>
+                <li>
+                  Avoided costs: flight to Paris, 3-month reservation wait, valet, coat
+                  check &mdash; {usd(AVOIDED_COSTS)}.
+                </li>
+                <li>
+                  Placebo premium: food you paid more for tastes {PLACEBO_MULTIPLIER}&times;
+                  better. This is science.
+                </li>
+              </ul>
+
+              <div className="calc">
+                <label htmlFor="calcPayment" className="calc-label">
+                  If you pay <strong>{usd(calcPayment)}</strong>
+                </label>
+                <input
+                  id="calcPayment"
+                  type="range"
+                  min="100"
+                  max="2000"
+                  step="50"
+                  value={calcPayment}
+                  onChange={(e) => setCalcPayment(Number(e.target.value))}
+                />
+                <p className="calc-result">
+                  you profit <strong>{usd(profitFor(calcPayment, 500))}</strong>
+                  <span className="calc-roi">
+                    {Math.round((profitFor(calcPayment, 500) / calcPayment) * 100).toLocaleString('en-US')}% ROI
+                  </span>
+                </p>
+              </div>
+
+              <p className="faq-table-caption">
+                Sensitivity analysis: your profit by amount paid and 3★ tasting-menu benchmark
+              </p>
+              <div className="faq-table-wrap">
+                <table className="faq-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">You pay</th>
+                      {benchmarks.map((b) => (
+                        <th scope="col" key={b.label}>
+                          {b.label}
+                          <span>{usd(b.price)}/head</span>
+                        </th>
+                      ))}
+                      <th scope="col">ROI (typical)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paymentLevels.map((pay) => (
+                      <tr key={pay}>
+                        <th scope="row">{usd(pay)}</th>
+                        {benchmarks.map((b) => (
+                          <td key={b.label}>+{usd(profitFor(pay, b.price))}</td>
+                        ))}
+                        <td>{Math.round((profitFor(pay, 500) / pay) * 100).toLocaleString('en-US')}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="faq-punchline">
+                Note that profit goes <em>up</em> the more you pay. That&apos;s not a typo.
+                That&apos;s economics. Please consult no financial advisor.
+              </p>
+            </div>
+          </details>
+
+          <details className="faq-item">
+            <summary>Shouldn&apos;t I try the pizza before I pay?</summary>
+            <div className="faq-answer">
+              <p>
+                Oh, absolutely. Just like every restaurant you go to, where you eat the whole
+                meal, think about it for a few days, and then decide whether you feel like
+                paying. Totally how that works. The waiters love it.
+              </p>
+              <p>
+                Anyway, since you&apos;re clearly ready now, you can upload your receipt
+                right here. Again.
+              </p>
+
+              {receiptStatus === 'sent' ? (
+                <p className="faq-receipt-success" role="status">
+                  Receipt received. Sherlock Harry has deduced that you made the right choice.
+                </p>
+              ) : (
+                <div className="faq-receipt">
+                  <div className="upload">
+                    {receiptPreview ? (
+                      <img src={receiptPreview} alt="Receipt preview" className="upload-preview" />
+                    ) : (
+                      <div className="upload-placeholder" aria-hidden="true">$</div>
+                    )}
+                    <div className="upload-body">
+                      <label htmlFor="receipt" className="upload-button">
+                        {receipt ? 'Change receipt' : 'Upload Venmo receipt'}
+                      </label>
+                      <span className="upload-filename">{receipt?.name ?? 'No file selected'}</span>
+                    </div>
+                    <input
+                      id="receipt"
+                      name="receipt"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleReceiptChange}
+                      className="upload-input"
+                    />
+                  </div>
+                  {receiptError && <span className="error">{receiptError}</span>}
+                  <button
+                    type="button"
+                    className="primary"
+                    onClick={handleReceiptSubmit}
+                    disabled={!receipt || receiptStatus === 'sending'}
+                  >
+                    {receiptStatus === 'sending' ? 'Sending…' : 'Send receipt'}
+                  </button>
+                </div>
+              )}
+            </div>
+          </details>
+        </div>
       </section>
 
       <footer className="footer">
