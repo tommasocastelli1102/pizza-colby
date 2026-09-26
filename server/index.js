@@ -38,6 +38,15 @@ async function ensureSchema() {
   `)
   // ADD COLUMN IF NOT EXISTS covers tables created before notified_at existed.
   await pool.query(`ALTER TABLE submissions ADD COLUMN IF NOT EXISTS notified_at TIMESTAMPTZ`)
+  // Extra payment receipts uploaded from the FAQ, not tied to a submission.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS receipts (
+      id SERIAL PRIMARY KEY,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      payment BYTEA NOT NULL,
+      payment_type TEXT NOT NULL
+    )
+  `)
 }
 
 await ensureSchema().catch((err) => {
@@ -96,6 +105,9 @@ app.get('/admin', requireAdminKey, async (req, res) => {
   const { rows } = await pool.query(
     `SELECT id, created_at, pineapple FROM submissions ORDER BY created_at DESC`
   )
+  const { rows: receipts } = await pool.query(
+    `SELECT id, created_at FROM receipts ORDER BY created_at DESC`
+  )
   const key = encodeURIComponent(req.query.key)
 
   const rowsHtml = rows
@@ -118,6 +130,21 @@ app.get('/admin', requireAdminKey, async (req, res) => {
     )
     .join('')
 
+  const receiptsHtml = receipts
+    .map(
+      (r) => `
+        <div class="row">
+          <figure>
+            <img src="/admin/receipt/${r.id}?key=${key}" alt="Payment receipt" />
+            <a href="/admin/receipt/${r.id}?key=${key}&download=1" download>Download</a>
+          </figure>
+          <div>
+            <strong>Receipt #${r.id}</strong> — ${new Date(r.created_at).toLocaleString()}
+          </div>
+        </div>`
+    )
+    .join('')
+
   res.send(`<!doctype html>
     <html>
       <head>
@@ -135,6 +162,8 @@ app.get('/admin', requireAdminKey, async (req, res) => {
       <body>
         <h1>Submissions (${rows.length})</h1>
         ${rowsHtml || '<p>No submissions yet.</p>'}
+        <h2>FAQ receipts (${receipts.length})</h2>
+        ${receiptsHtml || '<p>No receipts yet.</p>'}
       </body>
     </html>`)
 })
@@ -161,6 +190,47 @@ app.get('/admin/photo/:id/:field', requireAdminKey, async (req, res) => {
   }
 
   res.send(rows[0].data)
+})
+
+app.get('/admin/receipt/:id', requireAdminKey, async (req, res) => {
+  if (!pool) return res.status(503).send('Database not configured.')
+
+  const { rows } = await pool.query(`SELECT payment AS data, payment_type AS type FROM receipts WHERE id = $1`, [
+    req.params.id,
+  ])
+  if (!rows[0]) return res.status(404).send('Not found.')
+
+  const type = rows[0].type || 'application/octet-stream'
+  res.set('Content-Type', type)
+
+  if (req.query.download) {
+    const extension = type.split('/')[1]?.split('+')[0] || 'bin'
+    res.set('Content-Disposition', `attachment; filename="receipt-${req.params.id}.${extension}"`)
+  }
+
+  res.send(rows[0].data)
+})
+
+app.post('/api/receipt', upload.single('payment'), async (req, res) => {
+  const payment = req.file
+
+  if (!payment) {
+    return res.status(400).json({ error: 'Missing receipt.' })
+  }
+
+  if (pool) {
+    try {
+      await pool.query(`INSERT INTO receipts (payment, payment_type) VALUES ($1, $2)`, [
+        payment.buffer,
+        payment.mimetype,
+      ])
+    } catch (err) {
+      console.error('Failed to save receipt to database:', err)
+      return res.status(500).json({ error: 'Failed to save receipt.' })
+    }
+  }
+
+  res.json({ ok: true })
 })
 
 app.use((err, req, res, next) => {
