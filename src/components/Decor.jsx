@@ -247,7 +247,7 @@ export function MichelinStar({ className, size = 40, filled = true }) {
 export function MichelinRating({ stars, max = 5, size = 40 }) {
   return (
     <div className="michelin-rating" aria-label={`${stars} out of ${max} Michelin stars`}>
-      {Array.from({ length: max }, (_, i) => (
+      {Array.from({ length: Math.max(stars, max) }, (_, i) => (
         <MichelinStar key={i} size={size} filled={i < stars} />
       ))}
     </div>

@@ -127,14 +127,14 @@ const michelin = [
     img: chefKevin,
     stars: 5,
     distinction: 'Exceptional cuisine, worth a special journey. And a second mortgage.',
-    note: 'The first restaurant in history awarded more than three stars. The Guide had to print a new edition.',
+    note: 'The Guide only goes up to three stars. The inspectors made an exception, then printed a new edition.',
   },
   {
     chef: 'Tomato',
     img: chefTommy,
-    stars: 2,
-    distinction: 'Excellent cooking, worth a detour. A short one.',
-    note: 'Inspectors docked three stars for the fake Gucci glasses. Rules are rules.',
+    stars: 3,
+    distinction: 'Exceptional cuisine, worth a special journey. Just a shorter one.',
+    note: 'A perfect score, the highest the Guide allows. Unfortunately for Tomato, Kevin got five.',
   },
 ]
 
@@ -170,10 +170,12 @@ const testimonials = [
     location: 'Beverly Hills, CA',
   },
   {
-    title: 'I can speak Italian now. I never took a lesson.',
-    body: 'Woke up the morning after my first slice fluent in Italian. Unfortunately I then read the Italy vs. USA section of this website and I have chosen to forget it all out of respect for my country.',
-    date: 'August 14, 2026',
-    location: 'Florence (briefly), then back to LA',
+    author: 'Sherlock “6.3 inches” Harry',
+    title: 'The best pizza of my life',
+    body: 'The pizza was absolutely amazing. I ate three and still wanted more. I was so excited about my lunch that I showed the app to my date that evening, and you know what?\nThe pizza was only the second-best “meal” I had that night.\nHighly recommended. I’d happily pay more next time.',
+    note: 'Our pizza app cares about privacy. For this reason, the gender of Sherlock “6.3 inches” Harry’s date will not be disclosed.',
+    date: 'September 20, 2026',
+    location: 'Los Angeles, CA',
   },
 ]
 
@@ -219,6 +221,9 @@ function App() {
   const [evaluating, setEvaluating] = useState(false)
   const [evalDone, setEvalDone] = useState(false)
   const [evalError, setEvalError] = useState('')
+
+  const [reviewDraft, setReviewDraft] = useState({ name: '', rating: 5, title: '', body: '' })
+  const [reviewFlagged, setReviewFlagged] = useState(false)
 
   const [calcPayment, setCalcPayment] = useState(500)
   const [receipt, setReceipt] = useState(null)
@@ -394,6 +399,17 @@ function App() {
     }
   }
 
+  function handleReviewChange(field, value) {
+    setReviewDraft((prev) => ({ ...prev, [field]: value }))
+    setReviewFlagged(false)
+  }
+
+  function handleReviewSubmit(e) {
+    e.preventDefault()
+    // Every review gets flagged, no matter what it says.
+    setReviewFlagged(true)
+  }
+
   function handleReset() {
     if (photoPreview) URL.revokeObjectURL(photoPreview)
     if (paymentPreview) URL.revokeObjectURL(paymentPreview)
@@ -428,34 +444,6 @@ function App() {
           Join the VIP waiting list
         </a>
       </header>
-
-      <section className="michelin">
-        <div className="michelin-brand">
-          <MichelinStar size={34} />
-          <div className="michelin-wordmark">
-            <span className="michelin-name">MICHELIN</span>
-            <span className="michelin-guide">Guide &middot; Colby Ave 2026</span>
-          </div>
-        </div>
-        <h2>The stars are in</h2>
-        <p className="section-subtitle michelin-subtitle">
-          Our anonymous inspectors ate at PH4 on multiple Sundays. Their findings are final.
-        </p>
-        <div className="michelin-cards">
-          {michelin.map((entry) => (
-            <div className="michelin-card" key={entry.chef}>
-              <img src={entry.img} alt={entry.chef} className="michelin-photo" />
-              <h3>Chef {entry.chef}</h3>
-              <MichelinRating stars={entry.stars} />
-              <p className="michelin-score">
-                {entry.stars} / 5 Michelin stars
-              </p>
-              <p className="michelin-distinction">{entry.distinction}</p>
-              <p className="michelin-note">{entry.note}</p>
-            </div>
-          ))}
-        </div>
-      </section>
 
       <section className="details">
         <h2>How it works</h2>
@@ -507,6 +495,34 @@ function App() {
                   </span>
                 ))}
               </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="michelin">
+        <div className="michelin-brand">
+          <MichelinStar size={34} />
+          <div className="michelin-wordmark">
+            <span className="michelin-name">MICHELIN</span>
+            <span className="michelin-guide">Guide &middot; Colby Ave 2026</span>
+          </div>
+        </div>
+        <h2>The stars are in</h2>
+        <p className="section-subtitle michelin-subtitle">
+          Our anonymous inspectors ate at PH4 on multiple Sundays. Their findings are final.
+        </p>
+        <div className="michelin-cards">
+          {michelin.map((entry) => (
+            <div className="michelin-card" key={entry.chef}>
+              <img src={entry.img} alt={entry.chef} className="michelin-photo" />
+              <h3>Chef {entry.chef}</h3>
+              <MichelinRating stars={entry.stars} max={3} />
+              <p className="michelin-score">
+                {entry.stars} / 3 Michelin stars
+              </p>
+              <p className="michelin-distinction">{entry.distinction}</p>
+              <p className="michelin-note">{entry.note}</p>
             </div>
           ))}
         </div>
@@ -597,7 +613,7 @@ function App() {
               <div className="review-header">
                 <img src={sherlockHarry} alt="" className="review-avatar" />
                 <div>
-                  <p className="review-author">Sherlock Harry</p>
+                  <p className="review-author">{review.author ?? 'Sherlock Harry'}</p>
                   <p className="review-location">{review.location}</p>
                 </div>
               </div>
@@ -607,10 +623,71 @@ function App() {
               </div>
               <h3 className="review-title">{review.title}</h3>
               <p className="review-body">{review.body}</p>
+              {review.note && <p className="review-note">(Note: {review.note})</p>}
               <p className="review-date">Reviewed {review.date}</p>
             </article>
           ))}
         </div>
+
+        <form className="review-form" onSubmit={handleReviewSubmit}>
+          <h3>Leave a review</h3>
+          <div className="field">
+            <label htmlFor="reviewName">Your name</label>
+            <input
+              id="reviewName"
+              type="text"
+              value={reviewDraft.name}
+              onChange={(e) => handleReviewChange('name', e.target.value)}
+              required
+            />
+          </div>
+          <fieldset className="field">
+            <legend>Rating</legend>
+            <div className="review-rating-picker">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button
+                  type="button"
+                  key={n}
+                  className={n <= reviewDraft.rating ? 'review-star active' : 'review-star'}
+                  onClick={() => handleReviewChange('rating', n)}
+                  aria-label={`${n} star${n > 1 ? 's' : ''}`}
+                  aria-pressed={n === reviewDraft.rating}
+                >
+                  &#9733;
+                </button>
+              ))}
+            </div>
+          </fieldset>
+          <div className="field">
+            <label htmlFor="reviewTitle">Title</label>
+            <input
+              id="reviewTitle"
+              type="text"
+              value={reviewDraft.title}
+              onChange={(e) => handleReviewChange('title', e.target.value)}
+              required
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="reviewBody">Your review</label>
+            <textarea
+              id="reviewBody"
+              rows={5}
+              value={reviewDraft.body}
+              onChange={(e) => handleReviewChange('body', e.target.value)}
+              required
+            />
+          </div>
+          {reviewFlagged && (
+            <p className="review-flagged" role="alert">
+              <strong>Error:</strong> This review has been flagged for sexually inappropriate
+              content and has been forwarded to the FBI. Please remain where you are.
+            </p>
+          )}
+          <button type="submit" className="primary">
+            Submit review
+          </button>
+        </form>
       </section>
 
       <section className="detective">
