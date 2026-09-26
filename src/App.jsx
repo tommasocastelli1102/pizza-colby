@@ -165,6 +165,13 @@ const testimonials = [
   },
 ]
 
+// Reviews with a named author (Sherlock "6.3 inches" Harry) lead the list;
+// only the first one shows until "Load more reviews" is pressed.
+const orderedTestimonials = [
+  ...testimonials.filter((t) => t.author),
+  ...testimonials.filter((t) => !t.author),
+]
+
 // Sensitivity analysis assumptions
 const STAR_PRICE_MULTIPLIER = 1.8 // each extra Michelin star ≈ 1.8x the tasting menu price
 const AVOIDED_COSTS = 1340 // flight to Paris, 3-month reservation wait, valet, coat check
@@ -204,6 +211,8 @@ function App() {
   const [evalDone, setEvalDone] = useState(false)
   const [evalError, setEvalError] = useState('')
 
+  const [showdownOpen, setShowdownOpen] = useState(false)
+  const [showAllReviews, setShowAllReviews] = useState(false)
   const [reviewDraft, setReviewDraft] = useState({ name: '', rating: 5, title: '', body: '' })
   const [reviewFlagged, setReviewFlagged] = useState(false)
 
@@ -505,6 +514,18 @@ function App() {
           Before anyone votes on dough, let&apos;s settle the bigger rivalry. Numbers don&apos;t lie.
         </p>
 
+        <button
+          type="button"
+          className="collapse-toggle"
+          aria-expanded={showdownOpen}
+          aria-controls="showdown-content"
+          onClick={() => setShowdownOpen((open) => !open)}
+        >
+          {showdownOpen ? 'Hide the numbers' : 'Show the numbers'}
+          <span className="collapse-chevron" aria-hidden="true" />
+        </button>
+
+        <div id="showdown-content" className="showdown-content" hidden={!showdownOpen}>
         <div className="showdown-scoreboard">
           <div className="showdown-score showdown-score-usa">
             <span className="showdown-score-value">{showdown.length}</span>
@@ -568,6 +589,7 @@ function App() {
           everything else, won the wars that mattered, and then perfected the
           flavor too.
         </p>
+        </div>
       </section>
 
       <section className="reviews">
@@ -579,7 +601,7 @@ function App() {
           </p>
         </div>
         <div className="review-cards">
-          {testimonials.map((review) => (
+          {(showAllReviews ? orderedTestimonials : orderedTestimonials.slice(0, 1)).map((review) => (
             <article className="review-card" key={review.title}>
               <div className="review-header">
                 <img src={sherlockHarry} alt="" className="review-avatar" />
@@ -599,6 +621,12 @@ function App() {
             </article>
           ))}
         </div>
+
+        {!showAllReviews && orderedTestimonials.length > 1 && (
+          <button type="button" className="secondary load-more" onClick={() => setShowAllReviews(true)}>
+            Load more reviews ({orderedTestimonials.length - 1})
+          </button>
+        )}
 
         <form className="review-form" onSubmit={handleReviewSubmit}>
           <h3>Leave a review</h3>
