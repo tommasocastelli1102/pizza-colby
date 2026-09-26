@@ -156,10 +156,9 @@ const testimonials = [
     location: 'Beverly Hills, CA',
   },
   {
-    author: 'Sherlock “6.3 inches” Harry',
     title: 'The best pizza of my life',
     body: 'The pizza was absolutely amazing. I ate three and still wanted more. I was so excited about my lunch that I showed the app to my date that evening, and you know what?\nThe pizza was only the second-best “meal” I had that night.\nHighly recommended. I’d happily pay more next time.',
-    note: 'Our pizza app cares about privacy. For this reason, the gender of Sherlock “6.3 inches” Harry’s date will not be disclosed.',
+    note: 'Our pizza app cares about privacy. For this reason, the gender of Sherlock Harry’s date will not be disclosed.',
     date: 'September 20, 2026',
     location: 'Los Angeles, CA',
   },
